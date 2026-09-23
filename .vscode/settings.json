@@ -1,0 +1,7 @@
+{
+    // Corrige o erro "Can't find a usable init.tcl" do matplotlib (Tk) dentro da .venv no Python 3.13
+    "terminal.integrated.env.windows": {
+        "TCL_LIBRARY": "C:\\Users\\Gusta\\AppData\\Local\\Programs\\Python\\Python313\\tcl\\tcl8.6",
+        "TK_LIBRARY": "C:\\Users\\Gusta\\AppData\\Local\\Programs\\Python\\Python313\\tcl\\tk8.6"
+    }
+}
