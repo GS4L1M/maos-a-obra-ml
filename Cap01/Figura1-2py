@@ -1,0 +1,41 @@
+#Grafico utilizando para demonstrar o apredinzado baseado em modelos usando regressão linear
+#pagina 17 do livro 
+#importando os dados crus da OCDE e do FMI do nosso modulo carregar_dados
+from carregar_dados import oecd_bli, gdp_per_capita
+#função que junta as duas tabelas e tira os países das pontas
+from combinar_dados import prepare_country_stats
+#tabelas já prontas do manipulando_dados (sample_data = os 29 países que vão pro gráfico)
+#obs: importar esse arquivo roda os print de lá, por isso aparecem tabelas no terminal
+from manipulando_dados import remove_indices, keep_indices, sample_data, status_de_todos_paises
+import pandas as pd #tabelas
+import numpy as np #contas com vetores
+import matplotlib.pyplot as plt #gráficos
+
+#modelo linear: satisfação = θ0 + θ1 * PIB
+#θ0 = onde a reta começa (altura quando o PIB é 0) / θ1 = inclinação da reta
+#o gráfico mostra 3 retas com θ diferentes pra ver qual chega mais perto dos pontos
+
+#pontos dos 29 países, figsize=(5,3) é o tamanho da figura em polegadas
+sample_data.plot(kind='scatter', x="GDP per capita", y='Life satisfaction', figsize=(5,3))
+plt.xlabel("GDP per capita (USD)") #nome do eixo x
+plt.axis([0, 60000, 0, 10]) #x de 0 a 60 mil e y de 0 a 10
+X=np.linspace(0, 60000, 1000) #1000 valores de PIB igualmente espaçados entre 0 e 60 mil, usados pra desenhar as retas
+
+#reta vermelha: θ0 = 0 e θ1 = 2x10^-5 (2*X/100000 é o mesmo que 0.00002 * X), fica bem abaixo dos pontos
+plt.plot(X, 2*X/100000, "r")
+#o r antes das aspas deixa as barras \ do jeito que estão e o texto entre $ vira fórmula (\theta_0 vira θ₀)
+plt.text(40000, 2.7, r"$\theta_0 = 0$", fontsize=14, color="r")
+plt.text(40000, 1.8, r"$\theta_1 = 2 \times 10^{-5}$", fontsize=14, color="r")
+
+#reta verde: θ0 = 8 e θ1 negativo, começa alta e desce (vai contra os dados)
+plt.plot(X, 8 - 5*X/100000, "g")
+plt.text(5000, 9.1, r"$\theta_0 = 8$", fontsize=14, color="g")
+plt.text(5000, 8.2, r"$\theta_1 = -5 \times 10^{-5}$", fontsize=14, color="g")
+
+#reta azul: θ0 = 4 e θ1 = 5x10^-5, é a que passa mais perto dos pontos
+plt.plot(X, 4 + 5*X/100000, "b")
+plt.text(5000, 3.5, r"$\theta_0 = 4$", fontsize=14, color="b")
+plt.text(5000, 2.6, r"$\theta_1 = 5 \times 10^{-5}$", fontsize=14, color="b")
+
+#treinar o modelo (model.fit no modelo_linear.py) é achar sozinho o θ0 e o θ1 da melhor reta
+plt.show() #abre a janela do gráfico
