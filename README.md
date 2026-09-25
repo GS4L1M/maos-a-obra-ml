@@ -24,8 +24,6 @@ Se você curte ML, compra o livro! Vale cada página. 🙌
 
 ```
 Maos a obra aprendizado de maquinas/
-├── .vscode/
-│   └── settings.json        # conserto do Tcl/Tk pro matplotlib conseguir abrir a janela do gráfico
 ├── Cap01/
 │   ├── carregar_dados.py    # baixa os CSVs (se ainda não tiver) e carrega os dados da OCDE e do FMI
 │   ├── combinar_dados.py    # função prepare_country_stats, que junta as duas bases
@@ -95,13 +93,3 @@ Detalhe: no `import` não vai o `.py` no nome do arquivo.
 - **Nomes de coluna errados:** estava `"life satisfaction"` e `'life satisfacition'` (com erro de digitação). O certo é `"Life satisfaction"`, e o pandas diferencia maiúscula de minúscula.
 - **`plt.show()` virou `mpl.show()`:** nesse arquivo eu importei o matplotlib como `mpl`, não como `plt`.
 - **Organização:** tirei o download e a leitura dos CSVs daqui. Agora ele só importa os dados prontos com `from carregar_dados import oecd_bli, gdp_per_capita`. Também apaguei os imports que ficaram sobrando (`pandas`, `os`, `urllib.request`).
-
-### Ambiente: `.vscode/settings.json`
-- **Erro `_tkinter.TclError: Can't find a usable init.tcl`:** esse foi chato! No Python 3.13 com `.venv` no Windows, o matplotlib não achava os arquivos do Tcl/Tk pra abrir a janela do gráfico. Resolvi configurando no VS Code as variáveis que apontam onde eles estão:
-  ```json
-  "terminal.integrated.env.windows": {
-      "TCL_LIBRARY": "C:\\Users\\Gusta\\AppData\\Local\\Programs\\Python\\Python313\\tcl\\tcl8.6",
-      "TK_LIBRARY": "C:\\Users\\Gusta\\AppData\\Local\\Programs\\Python\\Python313\\tcl\\tk8.6"
-  }
-  ```
-  Fica esperto: isso só vale pra **terminal novo**. Depois de mudar, fecha o terminal e abre outro.
