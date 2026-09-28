@@ -18,6 +18,11 @@ Os arquivos têm um prefixo `p01`, `p02`... para aparecerem na ordem em que o li
 | `p08_conjunto_teste_id_localizacao.py` | usa o p06 com a longitude e a latitude como id |
 | `p09_conjunto_teste_sklearn.py` | conjunto de teste com o `train_test_split` |
 | `p10_conjunto_teste_estratificado.py` | conjunto de teste estratificado por faixa de renda (o que o livro usa) |
+| `p11_visualizando_dados_geograficos.py` | mapa dos distritos, com a cor pelo preço e a foto da Califórnia de fundo |
+| `p12_buscando_correlacoes.py` | correlação das colunas com o preço e o `scatter_matrix` |
+| `p13_combinacoes_de_atributos.py` | novas colunas criadas combinando outras (cômodos por casa etc.) |
+| `p14_preparando_e_limpando_dados.py` | separa os rótulos (preço) e preenche os valores vazios do `total_bedrooms` |
+| `p15_atributos_texto_e_transformadores.py` | transforma o `ocean_proximity` (texto) em números, cria um transformador próprio e junta tudo nos pipelines de transformação |
 
 Rode sempre a partir da pasta raiz do projeto: `python Cap02/p04_plot_colunas.py`.
 
