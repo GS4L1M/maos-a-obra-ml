@@ -23,8 +23,31 @@ Os arquivos têm um prefixo `p01`, `p02`... para aparecerem na ordem em que o li
 | `p13_combinacoes_de_atributos.py` | novas colunas criadas combinando outras (cômodos por casa etc.) |
 | `p14_preparando_e_limpando_dados.py` | separa os rótulos (preço) e preenche os valores vazios do `total_bedrooms` |
 | `p15_atributos_texto_e_transformadores.py` | transforma o `ocean_proximity` (texto) em números, cria um transformador próprio e junta tudo nos pipelines de transformação |
+| `p16_treinando_modelos.py` | treina regressão linear, árvore de decisão, random forest e SVR, e compara com validação cruzada |
+| `p17_ajuste_fino.py` | procura os melhores hiperparâmetros do random forest (`GridSearchCV` e `RandomizedSearchCV`) e mostra a importância de cada coluna |
+| `p18_avaliando_no_teste.py` | avalia o modelo final no conjunto de teste, com intervalo de confiança de 95% |
+| `p19_material_extra.py` | pipeline com preparação + modelo juntos, salvar o modelo com `joblib` e distribuições do SciPy |
+| `p20_exercicio1_svr_grid.py` | exercício 1: `SVR` com busca em grade (demora alguns minutos) |
+| `p21_exercicio2_svr_randomized.py` | exercício 2: `SVR` com busca aleatória (demora alguns minutos) |
+| `p22_exercicio3_selecionar_atributos.py` | exercício 3: transformador que mantém só as k colunas mais importantes |
+| `p23_exercicio4_pipeline_completo.py` | exercício 4: um pipeline só, da preparação até a previsão |
+| `p24_exercicio5_explorar_preparacao.py` | exercício 5: `GridSearchCV` testando opções da preparação (demora alguns minutos) |
 
 Rode sempre a partir da pasta raiz do projeto: `python Cap02/p04_plot_colunas.py`.
+
+Do p15 em diante, cada arquivo importa o que precisa dos anteriores (o `full_pipeline`, o `housing_prepared`, o melhor modelo do p17...). As partes que só mostram resultado ficam dentro de `if __name__ == "__main__":`. O p19 salva o modelo na pasta `modelos/`, que fica fora do Git.
+
+## Resultados (erro médio em dólares, RMSE)
+
+| Modelo | Onde | Erro |
+|---|---|---|
+| Regressão linear (validação cruzada) | p16 | ~69.100 |
+| Árvore de decisão (no treino / validação cruzada) | p16 | 0 / ~71.600 (decorou o treino: overfitting) |
+| Random forest (validação cruzada) | p16 | ~50.400 |
+| Random forest com busca em grade | p17 | ~49.900 |
+| SVR com busca em grade (exercício 1) | p20 | ~70.300 (levou uns 8 min aqui) |
+| SVR com busca aleatória (exercício 2) | p21 | ~54.800 (levou uns 10 min aqui) |
+| **Modelo final no conjunto de teste** | p18 | **~47.900** (95% de confiança: 45.900 a 49.800) |
 
 ## Criando o conjunto de teste
 

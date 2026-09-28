@@ -2,7 +2,7 @@ from p10_conjunto_teste_estratificado import strat_train_set
 from sklearn.preprocessing import OrdinalEncoder, OneHotEncoder, StandardScaler
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.impute import SimpleImputer
-from sklearn.pipeline import Pipeline
+from sklearn.pipeline import Pipeline, FeatureUnion
 from sklearn.compose import ColumnTransformer
 import numpy as np
 import pandas as pd
@@ -12,33 +12,38 @@ pd.set_option("display.max_columns", None)
 
 #mesmo housing do p14: o treino sem a coluna do preço
 housing = strat_train_set.drop("median_house_value", axis=1)
+#os rotulos (o preço) tambem ficam aqui, porque o p16 importa daqui para treinar os modelos
+housing_labels = strat_train_set["median_house_value"].copy()
+
+#este arquivo é importado pelos proximos (p16 em diante), que só precisam do pipeline pronto
+#por isso as partes de demonstração ficam dentro de if __name__ == "__main__":
+#e só rodam quando executo este arquivo direto (igual no p10)
 
 #lidando com atributos de texto e categoricos
 #o ocean_proximity é texto (INLAND, NEAR BAY...) e os algoritmos só fazem conta com numero
 #os colchetes duplos [[ ]] pegam a coluna como tabela (DataFrame), que é o formato que o sklearn espera
 housing_cat = housing[["ocean_proximity"]]
-housing_cat.head(10)#no notebook isso aparecia sozinho, no .py não mostra nada, por isso o print embaixo
-print(housing_cat.head(10))
+if __name__ == "__main__":
+    print(housing_cat.head(10))
 
-#OrdinalEncoder troca cada categoria por um numero (0, 1, 2, 3, 4)
-#fit_transform = fit (aprende quais categorias existem) + transform (troca o texto pelo numero) de uma vez
-Ordinal_enconder = OrdinalEncoder()
-housing_cat_encoded= Ordinal_enconder.fit_transform(housing_cat)
-print(housing_cat_encoded[:10])
-#a lista das categorias que ele aprendeu, na ordem: a posição na lista é o numero que ela virou
-print(Ordinal_enconder.categories_)
-#problema: o algoritmo acha que 0 e 1 são "parecidos" e 0 e 4 "distantes", o que não é verdade aqui
-#(<1H OCEAN = 0 e NEAR OCEAN = 4 são bem parecidos na vida real)
+    #OrdinalEncoder troca cada categoria por um numero (0, 1, 2, 3, 4)
+    #fit_transform = fit (aprende quais categorias existem) + transform (troca o texto pelo numero) de uma vez
+    Ordinal_enconder = OrdinalEncoder()
+    housing_cat_encoded= Ordinal_enconder.fit_transform(housing_cat)
+    print(housing_cat_encoded[:10])
+    #a lista das categorias que ele aprendeu, na ordem: a posição na lista é o numero que ela virou
+    print(Ordinal_enconder.categories_)
+    #problema: o algoritmo acha que 0 e 1 são "parecidos" e 0 e 4 "distantes", o que não é verdade aqui
+    #(<1H OCEAN = 0 e NEAR OCEAN = 4 são bem parecidos na vida real)
 
-#solução: one-hot, cria uma coluna para cada categoria, com 1 na categoria da casa e 0 nas outras
-#assim nenhuma categoria fica "mais perto" da outra
-cat_encoder = OneHotEncoder()
-housing_cat_1hot = cat_encoder.fit_transform(housing_cat)
-housing_cat_1hot#mesma coisa do head(10) lá em cima, no .py não mostra nada
-#o resultado é uma matriz esparsa (guarda só onde tem 1, pra economizar memoria)
-#toarray() transforma numa matriz normal do numpy só para conseguirmos ver
-print(housing_cat_1hot.toarray())
-print(cat_encoder.categories_)
+    #solução: one-hot, cria uma coluna para cada categoria, com 1 na categoria da casa e 0 nas outras
+    #assim nenhuma categoria fica "mais perto" da outra
+    cat_encoder = OneHotEncoder()
+    housing_cat_1hot = cat_encoder.fit_transform(housing_cat)
+    #o resultado é uma matriz esparsa (guarda só onde tem 1, pra economizar memoria)
+    #toarray() transforma numa matriz normal do numpy só para conseguirmos ver
+    print(housing_cat_1hot.toarray())
+    print(cat_encoder.categories_)
 
 
 #transformadores customizados
@@ -66,22 +71,24 @@ class CombineAttributesAdder(BaseEstimator, TransformerMixin):
         else:
             return np.c_[x, rooms_per_household, population_per_household]
 
-attr_adder = CombineAttributesAdder(add_bedrooms_per_room=False)
-#.values transforma a tabela do pandas numa matriz do numpy (por isso usamos os indices numericos)
-housing_extra_attribs = attr_adder.transform(housing.values)
-print(housing_extra_attribs[:5])
 #Observe que fixei os índices (3, 4, 5, 6) diretamente no código para concisão e clareza no livro, mas seria muito mais limpo obtê-los dinamicamente, desta forma:
 #get_loc procura a posição da coluna pelo nome, assim se a ordem das colunas mudar o codigo não quebra
 col_names = "total_rooms", "total_bedrooms","population", "households"
 rooms_ix, bedrooms_ix, population_ix, househlds_ix = [housing.columns.get_loc(c) for c in col_names]
 
-#renomeando as colunas
-#a matriz do numpy volta a ser tabela do pandas, com os nomes antigos + os 2 nomes novos
-housing_extra_attribs = pd.DataFrame(
-    housing_extra_attribs,
-    columns=list(housing.columns)+["rooms_per_household", "population_per_household"],
-    index=housing.index)
-print(housing_extra_attribs.head())
+if __name__ == "__main__":
+    attr_adder = CombineAttributesAdder(add_bedrooms_per_room=False)
+    #.values transforma a tabela do pandas numa matriz do numpy (por isso usamos os indices numericos)
+    housing_extra_attribs = attr_adder.transform(housing.values)
+    print(housing_extra_attribs[:5])
+
+    #renomeando as colunas
+    #a matriz do numpy volta a ser tabela do pandas, com os nomes antigos + os 2 nomes novos
+    housing_extra_attribs = pd.DataFrame(
+        housing_extra_attribs,
+        columns=list(housing.columns)+["rooms_per_household", "population_per_household"],
+        index=housing.index)
+    print(housing_extra_attribs.head())
 
 
 #pipelines de transformação
@@ -104,7 +111,8 @@ num_pipeline = Pipeline([
 
 #fit_transform no pipeline chama o fit_transform de cada etapa em sequencia
 housing_num_tr = num_pipeline.fit_transform(housing_num)
-print(housing_num_tr)
+if __name__ == "__main__":
+    print(housing_num_tr)
 
 #ColumnTransformer: um pipeline só para as colunas de numero e outro só para as de texto, tudo junto
 #list(housing_num) devolve a lista com os nomes das colunas numericas
@@ -120,6 +128,43 @@ full_pipeline = ColumnTransformer([
 #ele aplica cada transformador nas suas colunas e gruda os resultados lado a lado
 #recebe o housing completo (com o texto) e devolve tudo pronto para o modelo
 housing_prepared = full_pipeline.fit_transform(housing)
-print(housing_prepared)
-#16512 casas e 16 colunas: 8 numericas + 3 combinadas + 5 do one-hot
-print(housing_prepared.shape)
+if __name__ == "__main__":
+    print(housing_prepared)
+    #16512 casas e 16 colunas: 8 numericas + 3 combinadas + 5 do one-hot
+    print(housing_prepared.shape)
+
+
+#para referencia: o jeito antigo, antes de existir o ColumnTransformer
+#um transformador que só escolhe algumas colunas da tabela, e o FeatureUnion gruda os resultados
+class OldDataFrameSelector(BaseEstimator, TransformerMixin):
+    def __init__(self, attribute_names):
+        self.attribute_names = attribute_names
+    def fit(self, x, y=None):
+        return self
+    def transform(self, x):
+        return x[self.attribute_names].values
+
+if __name__ == "__main__":
+    #cada pipeline começa escolhendo as suas colunas com o selector
+    old_num_pipeline = Pipeline([
+            ('selector', OldDataFrameSelector(num_attribs)),
+            ('imputer', SimpleImputer(strategy="median")),
+            ('attribs_adder', CombineAttributesAdder()),
+            ('std_scaler', StandardScaler()),
+        ])
+    #no livro é sparse=False, nas versões novas do sklearn o nome mudou para sparse_output=False
+    #(devolve matriz normal em vez de esparsa, para poder grudar com a parte numerica)
+    old_cat_pipeline = Pipeline([
+            ('selector', OldDataFrameSelector(cat_attribs)),
+            ('cat_encoder', OneHotEncoder(sparse_output=False)),
+        ])
+    #o FeatureUnion roda os dois pipelines e junta as colunas lado a lado
+    old_full_pipeline = FeatureUnion(transformer_list=[
+            ("num_pipeline", old_num_pipeline),
+            ("cat_pipeline", old_cat_pipeline),
+        ])
+    old_housing_prepared = old_full_pipeline.fit_transform(housing)
+    print(old_housing_prepared)
+    #np.allclose confere se as duas matrizes são iguais (aceitando diferenças minusculas de arredondamento)
+    #True = o jeito antigo e o ColumnTransformer dão o mesmo resultado
+    print(np.allclose(housing_prepared, old_housing_prepared))
