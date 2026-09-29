@@ -1,7 +1,6 @@
 #importando os dados do MNIST que foram carregados no p2
-from p2_minst import X, y, some_digit
+from p_2_minst import X, y, some_digit
 from sklearn.linear_model import SGDClassifier
-import pandas as pd
 import numpy as np
 
 
@@ -15,6 +14,9 @@ y_test_5 = (y_test == 5)
 #SGD = gradiente descendente estocástico; o random_state fixa o sorteio para o resultado se repetir
 sgd_clf = SGDClassifier(max_iter=1000, tol=1e-3, random_state=42)
 sgd_clf.fit(X_train, y_train_5)
-#pergunta ao modelo se o some_digit (aquele 5 do p2) é um 5
-sgd_clf.predict([some_digit])
-print(sgd_clf)
+
+#só roda quando executamos o p3 diretamente, e não quando os outros arquivos importam o sgd_clf
+if __name__ == "__main__":
+    print(sgd_clf)
+    #pergunta ao modelo se o some_digit (aquele 5 do p2) é um 5
+    print(f"o some_digit é um 5? {sgd_clf.predict([some_digit])}")

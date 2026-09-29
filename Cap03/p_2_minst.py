@@ -1,5 +1,5 @@
 #importando o dataset mnist_784 (70 mil imagens de dígitos escritos à mão, de 28x28 pixels)
-from p1_configuracao_inicial import save_fig
+from p_1_configuracao_inicial import save_fig
 from sklearn.datasets import fetch_openml
 import matplotlib as mpl
 import matplotlib.pyplot as plt
